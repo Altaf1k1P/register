@@ -35,7 +35,13 @@ export const getAllPosts = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get("/posts");
-            return response.data;
+            if (response && response.data) {
+                console.log("get all post API Response:", response.data);
+                return response.data; // Return user data if response is valid
+              } else {
+                // In case response or response.data is undefined
+                return rejectWithValue("getallpost failed: No response data");
+              }
         } catch (error) {
            // console.error(error);
             return rejectWithValue(handleError(error));
