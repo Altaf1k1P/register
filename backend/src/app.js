@@ -13,6 +13,7 @@ app.use(express.json({ limit: '16kb' }));
 app.use(cors({
     origin: "http://localhost:5173", // Replace with your frontend URL
     credentials: true, // Allow cookies to be sent in requests and responses  // some legacy browsers (IE11, various older browsers) choke on 204
+    methods: 'GET, POST, PUT, DELETE',
 }));
 
 // Enable cookie-parser middleware
