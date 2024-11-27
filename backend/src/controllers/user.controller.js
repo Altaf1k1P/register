@@ -112,6 +112,54 @@ const logout = async (req, res) => {
 };
 
 
+const refreshAccessToken = async (req, res) => {
+    // Step 1: Get refresh token from cookie (web) or body (phone app)
+   const incomingRefreshToken = req.cookie.refreshToken || res.body.refreshToken
+  
+   if(!incomingRefreshToken){
+    res.status(500).json(401, "unauthorized refresh token")
+   }
+  
+   try {
+   
+       // Step 2: verify refresh token 
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+    
+   
+       // Step 3: find user by id
+     const user = await User.findById(decodedToken?._id)
+  
+     if(!user){
+        res.status(400).json(401, "invalid refresh token")
+     }
+  
+     // Step 4: check incoming refresh token and user token are same
+     if(incomingRefreshToken !== user?.refreshToken){
+        res.status(400).json(401, "refresh token is used or expired")
+     }
+  
+     // Step 5: set cookie option
+     const options = {
+       httpOnly: true, // Prevent frontend from accessing cookies
+       secure: true // Use secure cookies only in production
+        // Prevent CSRF attacks by disallowing cross-origin requests to send cookies
+     };
+    
+   
+     //step 5: create new access and refresh token
+    const {accessToken, newRefreshToken } = await genrateAccessAndRefreshToken(user?._id)
+    
+   return res
+   .status(200)
+   .cookie("accessToken", accessToken, options)
+   .cookie("refreshToken", newRefreshToken, options)
+    
+   } catch (error) {
+    res.status(500).json(401, error?.message || "Invalid refresh token",error)
+   }
+  }
+
+
 //get current user
 
 
@@ -120,4 +168,5 @@ export {
     register,
     login,
     logout,
+    refreshAccessToken
 }

@@ -20,6 +20,12 @@ export const createAccount = createAsyncThunk("user/signup",async (formData)=>{
     }
 });
 
+export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async () => {
+  const response = await axiosInstance.post("/auth/refresh-token");
+  localStorage.setItem("accessToken", response.data.accessToken);  // Store the new token
+  return response.data;
+});
+
 export const loginUser = createAsyncThunk(
     "user/login",
     async (credentials, { rejectWithValue }) => {
@@ -47,14 +53,17 @@ export const loginUser = createAsyncThunk(
   );
   
 
-export const logoutUser = createAsyncThunk("user/logout",async(_,{rejectWithValue})=>{
+  export const logoutUser = createAsyncThunk("user/logout", async (_, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post("/auth/logout", {}, { withCredentials: true })
-        return response.data;
+      const response = await axiosInstance.post("/auth/logout", {}, { withCredentials: true });
+      localStorage.removeItem("accessToken");  // Clear token from localStorage
+      localStorage.removeItem("refreshToken");
+      return response.data;
     } catch (error) {
-        return rejectWithValue(error.response.data || 'Logout failed');
+      return rejectWithValue(error.response?.data || "Logout failed");
     }
-});
+  });
+  
 
 const authSlice = createSlice({
     name: "auth",
@@ -114,7 +123,19 @@ const authSlice = createSlice({
                 state.user = '';
                 state.accessToken = null;
                 state.refreshToken = null;
-            });
+            })
+            .addCase(refreshAccessToken.pending, (state) => {
+              state.status = 'loading';
+          })
+          .addCase(refreshAccessToken.fulfilled, (state, action) => {
+              state.status = 'succeeded';
+              state.accessToken = action.payload.accessToken;
+          })
+          .addCase(refreshAccessToken.rejected, (state, action) => {
+              state.status = 'failed';
+              state.error = action.payload;
+          });
+          
         },
 });
 
