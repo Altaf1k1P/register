@@ -7,7 +7,15 @@ const initialState = {
     loading: false,
     post: null, // renamed from "Post" to follow camelCase
 };
-
+const handleError = (error) => {
+    if (error.response) {
+        return error.response.data || "An error occurred";
+    } else if (error.message) {
+        return error.message;
+    } else {
+        return "Something went wrong";
+    }
+};
 // Thunks
 export const createPost = createAsyncThunk(
     "post/createPost",
@@ -17,7 +25,7 @@ export const createPost = createAsyncThunk(
             return response.data;
         } catch (error) {
            // console.error(error);
-            return rejectWithValue(error.response?.data || "Post creation failed");
+            return rejectWithValue(handleError(error));
         }
     }
 );
@@ -30,7 +38,7 @@ export const getAllPosts = createAsyncThunk(
             return response.data;
         } catch (error) {
            // console.error(error);
-            return rejectWithValue(error.response?.data || "Post fetching failed");
+            return rejectWithValue(handleError(error));
         }
     }
 );
@@ -43,7 +51,7 @@ export const deletePost = createAsyncThunk(
         return postId; // Return only the postId to delete it from the state
       } catch (error) {
         //console.error(error);
-        return rejectWithValue(error.response?.data || "Post deletion failed");
+        return rejectWithValue(handleError(error));
       }
     }
   );
@@ -57,7 +65,7 @@ export const updatePost = createAsyncThunk(
             return response.data;
         } catch (error) {
             //console.error(error);
-            return rejectWithValue(error.response?.data || "Post update failed");
+            return rejectWithValue(handleError(error));
         }
     }
 );
@@ -70,7 +78,7 @@ export const myPost = createAsyncThunk(
             return response.data;
         } catch (error) {
             //console.error(error);
-            return rejectWithValue(error.response?.data || "Fetching user posts failed");
+            return rejectWithValue(handleError(error));
         }
     }
 );
@@ -89,9 +97,13 @@ const postSlice = createSlice({
             })
             .addCase(createPost.fulfilled, (state, action) => {
                 state.loading = false;
-                state.posts = Array.isArray(state.posts) ? state.posts : []; // Reset to an array if corrupted
-                state.posts.push(action.payload);
+                state.posts = Array.isArray(state.posts) ? state.posts : [];
+                // Avoiding duplicates by checking if the post already exists
+                if (!state.posts.some(post => post.id === action.payload.id)) {
+                    state.posts.push(action.payload);
+                }
             })
+            
             .addCase(createPost.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
@@ -118,10 +130,11 @@ const postSlice = createSlice({
             })
             // Slice
             .addCase(deletePost.fulfilled, (state, action) => {
-             state.loading = false;
-           // Filter out the deleted post by matching the id
-           state.posts = state.posts.filter((post) => post.id !== action.payload);
-          })
+                state.loading = false;
+                // Assuming the response returns postId for the deleted post
+                state.posts = state.posts.filter((post) => post.id !== action.payload); 
+            })
+            
   
             .addCase(deletePost.rejected, (state, action) => {
                 state.loading = false;
