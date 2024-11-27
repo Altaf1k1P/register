@@ -10,7 +10,7 @@ const Home = () => {
     // Ensure default values for posts
     const { posts=[], loading, error } = useSelector((state) => state.post);
     const user = useSelector(selectUser);
-   // console.log(posts);
+   console.log(posts);
     
 
     useEffect(() => {
