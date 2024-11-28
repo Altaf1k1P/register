@@ -10,19 +10,36 @@ const axiosInstance = axios.create({
 });
 
 // Request Interceptor to add Authorization header
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Get the token from localStorage and add it to the request headers
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+axiosInstance.interceptors.response.use(
+  (response) => response, // If the response is successful, just return it
+  async (error) => {
+    // Check if the error is a 401 (Unauthorized) due to expired token
+    if (error.response && error.response.status === 401) {
+      try {
+        // Try to refresh the access token
+        const refreshResponse = await axiosInstance.post("/auth/refresh-token");
+
+        // Update accessToken in localStorage and retry the original request
+        localStorage.setItem("accessToken", refreshResponse.data.accessToken);
+        
+        // Retry the original request with the new access token
+        const originalRequest = error.config;
+        originalRequest.headers["Authorization"] = `Bearer ${refreshResponse.data.accessToken}`;
+
+        // Return the new request with the updated token
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        // If refresh fails, log the user out (clear tokens, redirect to login)
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login"; // Redirect to login page
+        return Promise.reject(err);
+      }
     }
-    return config;
-  },
-  (error) => {
-    // If an error occurs during request setup, log it
     return Promise.reject(error);
   }
 );
+
+
 
 export default axiosInstance;

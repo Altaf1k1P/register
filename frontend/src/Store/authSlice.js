@@ -102,17 +102,22 @@ const authSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(loginUser.fulfilled, (state, action) => {
-                const { loginUser, accessToken, refreshToken } = action.payload || {}; // Destructure the API response
-              
-                if (!loginUser) {
+              const { loginUser, accessToken, refreshToken } = action.payload || {}; // Destructure the API response
+          
+              if (!loginUser) {
                   console.warn("User data is missing in the response");
-                }
-              
-                state.status = 'succeeded';
-                state.user = loginUser || ''; // Assign loginUser as user data
-                state.accessToken = accessToken || null;
-                state.refreshToken = refreshToken || null;
-              })
+              }
+          
+              state.status = 'succeeded';
+              state.user = loginUser || ''; // Assign loginUser as user data
+              state.accessToken = accessToken || null;
+              state.refreshToken = refreshToken || null;
+          
+              // Store tokens in localStorage
+              localStorage.setItem("accessToken", accessToken);
+              localStorage.setItem("refreshToken", refreshToken);
+          })
+          
               
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'failed';
