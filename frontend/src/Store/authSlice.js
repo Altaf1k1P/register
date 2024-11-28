@@ -34,7 +34,7 @@ export const loginUser = createAsyncThunk(
         
         // Ensure the response object and data are present before accessing
         if (response && response.data) {
-          console.log("Login API Response:", response.data);
+          //console.log("Login API Response:", response.data);
           return response.data; // Return user data if response is valid
         } else {
           // In case response or response.data is undefined

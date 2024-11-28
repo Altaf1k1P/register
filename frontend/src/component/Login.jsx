@@ -11,7 +11,7 @@ function Login() {
   const dispatch = useDispatch()
   const [credentials, setCredentials] = useState({username: '', password: ''})
   const [error , setError] = useState(null)
-  console.log(error);
+  //console.log(error);
   
  
 
@@ -20,12 +20,12 @@ function Login() {
     e.preventDefault();
     try {
       await dispatch(loginUser(credentials)).unwrap();
-     console.log("Dispatching credentials:", credentials); // Debug log
+     //console.log("Dispatching credentials:", credentials); // Debug log
     alert('Account created successfully!');
           navigate('/');
 
     } catch (err) {
-      console.error('login failed:', err);
+      //console.error('login failed:', err);
       setError(err.message || 'Something went wrong. Please try again.');
     }
 };
@@ -36,43 +36,56 @@ function Login() {
     <>
     
       <Container>
-        <div className='flex  justify-center items-center bg-zinc-800 shadow-sm max-w-sm h-5/6 mt-4'>
+        <div className='className="container max-w-lg mx-auto mt-8 p-4 bg-white rounded-lg shadow-md'>
 
-        <div className='flex flex-col justify-center items-center m-4'>
-          <h1 className='text-center'>Login</h1>
-          {error && <p className="error-message">{error}</p>}
+        
+          <h1 className='text-2xl font-bold mb-4'>Login</h1>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <form onSubmit={handleSubmit}>
-             <label htmlFor="username">Username</label>
+          <div className="mb-4">
+            <label htmlFor="username" className='block text-lg font-semibold mb-2'>Username</label>
           <input 
           type="text" 
           placeholder='username..' 
-          className='px-2 py-1 w-full mb-1'
+        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={credentials.username}
                 onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                  />
-          <label htmlFor="password">Password</label>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className='block text-lg font-semibold mb-2'>Password</label>
           <input 
           type="password" 
           placeholder='username..' 
-          className='px-2 py-1 w-full mb-1'
+         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={credentials.password}
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} 
           />
-          <button type='submit' className='bg-zinc-800 px-4 py-3 '>Login</button>
-
-
-          </form>
-
-          <p className="mt-4 text-sm text-center text-gray-600">
+          </div>
+          
+          <div className="flex justify-between items-center">
+          <button
+            type="submit"
+            className={'px-4 py-2 text-white rounded-md   bg-blue-500 hover:bg-blue-600'}
+          >
+            login
+          </button>
+           <p className="mt-4 text-sm text-center text-gray-600">
                     don't have an account?{' '}
                     <Link to="/signup" className="text-indigo-600 hover:underline">
                         Signup
                     </Link>
                 </p>
+                
+        </div>
+        </form>
+      
+
+         
          
 
 
-        </div>
+        
         
         </div>
       </Container>
@@ -82,3 +95,4 @@ function Login() {
 }
 
 export default Login
+

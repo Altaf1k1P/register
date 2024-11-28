@@ -1,73 +1,92 @@
-import React,{useState} from 'react'
-import {createPost} from "../Store/postSlice.js"
-import { useDispatch } from 'react-redux'
-import Container from './container.jsx'
+import React, { useState } from 'react';
+import { createPost } from "../Store/postSlice.js";
+import { useDispatch } from 'react-redux';
+import Container from './container.jsx';
 import { useNavigate } from 'react-router-dom';
 
-
 function AddPost() {
-  const [post, setPost] = useState({title: '', content: ''});
+  const [post, setPost] = useState({ title: '', content: '' });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     try {
-       
-    await dispatch(createPost(post)).unwrap();
-
-      alert('post created successfully!');
+      await dispatch(createPost(post)).unwrap();
+      alert('Post created successfully!');
       navigate('/');
-
     } catch (err) {
-      console.error('post creation failed:', err);
+      console.error('Post creation failed:', err);
       setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
-   
-  }
+  };
 
   return (
-    
-      <div className="">
-        <Container>
-        <div className='flex flex-col justify-center items-center bg-zinc-800 shadow-sm max-w-sm h-full mt-4'>
-         <h2 className='mt-2'>add-post</h2>
-          {error && <p className="error-message">{error}</p>}
-          <form onSubmit={handleSubmit}>
-              <div className='flex flex-col m-2'>
-                  <label htmlFor="Title">Title</label>
-                  <input
-                      type="text"
-                      placeholder="Title..."
-                       className='px-2 py-1 w-full mb-1'
-                      value={post.title}
-                      onChange={(e) => setPost({ ...post, title: e.target.value })}
-                      required
-                  />
-              </div>
-              
-              <div className='flex flex-col m-2'>
-                  <label htmlFor="content">contant</label>
-                  <textarea
-                     
-                      placeholder="contant.."
-                       className='px-2 py-1 w-full mb-1'
-                      value={post.content}
-                      onChange={(e) => setPost({ ...post, content: e.target.value })}
-                      required
-                  />
-              </div>
-              <button type="submit" className='m-2 px-3 py-3 bg-slate-950 rounded-sm'>AddPost</button>
-          </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <Container>
+        <div className="bg-white shadow-lg rounded-lg p-6 max-w-md w-full">
+          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">Add Post</h2>
 
+          {error && (
+            <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {/* Title Field */}
+            <div className="mb-4">
+              <label htmlFor="title" className="block text-gray-700 font-medium mb-1">
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                placeholder="Enter a title..."
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+                value={post.title}
+                onChange={(e) => setPost({ ...post, title: e.target.value })}
+                required
+                aria-label="Post title"
+              />
+            </div>
+
+            {/* Content Field */}
+            <div className="mb-4">
+              <label htmlFor="content" className="block text-gray-700 font-medium mb-1">
+                Content
+              </label>
+              <textarea
+                id="content"
+                placeholder="Enter content..."
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+                value={post.content}
+                onChange={(e) => setPost({ ...post, content: e.target.value })}
+                required
+                aria-label="Post content"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`w-full py-2 px-4 text-white font-medium rounded-md ${
+                loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+              disabled={loading}
+            >
+              {loading ? 'Adding Post...' : 'Add Post'}
+            </button>
+          </form>
         </div>
-            
-        </Container>
-       
-      </div>
-  )
+      </Container>
+    </div>
+  );
 }
 
-export default AddPost
+export default AddPost;

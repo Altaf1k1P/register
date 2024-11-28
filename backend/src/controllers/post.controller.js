@@ -1,12 +1,15 @@
 import {Post} from "../models/post.models.js"
 import {User} from "../models/user.models.js"
 import { isValidObjectId } from "mongoose";
+import { asyncHandler } from "../utills/asyncHandler.js";
+import { ApiError } from "../utills/ApiError.js";
+import { ApiResponse } from "../utills/ApiResponse.js";
 
 
 
 //create a new post
 
-const createPost = async (req, res) => {
+const createPost = asyncHandler(async (req, res) => {
     try {
         const { title, content} = req.body;
         const userId = req.user?._id;
@@ -30,28 +33,28 @@ if(!isValidObjectId(userId)){
         content,
         owner: req.user._id // Assuming req.user has a _id property and it's the user who created the post. Replace this with the actual user ID.  // the user ID is obtained from the user who is logged in.
         })
-    return res.status(201).json({ post });
+        return res.status(200).json(new ApiResponse(200,post));
     } catch (error) {
         res.status(500).json({ error: "something went wrong while creating post"})
     }
     
-};
+});
 
 //get all posts
 
-const getAllPosts = async (req, res) => {
+const getAllPosts =asyncHandler( async (req, res) => {
     try {
         const posts = await Post.find().populate("owner");
-        res.status(200).json(posts);
+        return res.status(200).json(new ApiResponse(200, posts));
         
     } catch (error) {
         res.status(500).json({ error: "something went wrong while getting posts"})
     }
     
-};
+});
 
 //get my post
-const getMyPost = async (req, res) => {
+const getMyPost = asyncHandler(async (req, res) => {
     try {
         const { userId } = req.params; // Extract userId from route params
 
@@ -64,7 +67,7 @@ const getMyPost = async (req, res) => {
         }
     
         // Send the posts as a response
-        res.status(200).json(userPosts)
+        return res.status(200).json(new ApiResponse(200,userPosts));
 
     } catch (error) {
         // Log the error for debugging
@@ -73,7 +76,7 @@ const getMyPost = async (req, res) => {
         // Return a server error response
         return res.status(500).json({ error: "Server error while retrieving posts" });
     }
-};
+});
 
 // const getPostById = async (req, res) => {
 //     const {postId} = req.params;
@@ -93,15 +96,14 @@ const getMyPost = async (req, res) => {
 
 
 
-//update post
-
-const updatePost = async (req, res) => {
+const updatePost = asyncHandler(async (req, res) => {
     try {
         const { title, content } = req.body;
         const { postId } = req.params;
 
-        // Log the postId for debugging
-        //console.log(`Received postId: ${postId}`);
+        // Debug logs
+        console.log(`Received postId: ${postId}`);
+        console.log("Request body:", req.body);
 
         // Validate postId
         if (!isValidObjectId(postId)) {
@@ -119,8 +121,7 @@ const updatePost = async (req, res) => {
             return res.status(404).json({ error: "Post not found" });
         }
 
-        // Log the retrieved post for debugging
-        //console.log(`Retrieved post: ${post}`);
+        console.log(`Retrieved post: ${post}`);
 
         // Check ownership
         if (post.owner.toString() !== req.user?._id.toString()) {
@@ -131,33 +132,27 @@ const updatePost = async (req, res) => {
         const updatedPost = await Post.findByIdAndUpdate(
             postId,
             { $set: { title: title.trim(), content: content.trim() } },
-            { new: true } // Return the updated document
+            { new: true }
         );
 
-        // Handle case where the post is not updated
         if (!updatedPost) {
             return res.status(404).json({ error: "Post not found or not updated" });
         }
 
-        // Log the updated post for debugging
-        //console.log(`Updated post: ${updatedPost}`);
+        console.log(`Updated post: ${updatedPost}`);
 
-        // Return the updated post
-        return res.status(200).json({ updatedPost });
-
+        return res.status(200).json(new ApiResponse(200,updatedPost,"post update successfully") );
     } catch (error) {
-        // Log the error for debugging
-        //console.error("Error while updating the post:", error);
-
-        // Return a server error response
-        return res.status(500).json({ error: "Something went wrong while updating the post" });
+        console.error("Error while updating the post:", error);
+        return res.status(500).json({ error: error.message || "Internal server error" });
     }
-};
+});
+
 
 
 //delete post
 
-const deletePost = async (req, res) => {
+const deletePost =asyncHandler( async (req, res) => {
     console.log("Deleting post...");
     try {
       const { postId } = req.params;
@@ -174,12 +169,12 @@ const deletePost = async (req, res) => {
   
       await Post.findByIdAndDelete(postId);
       console.log("Post deleted successfully");
-      return res.status(200).json({ message: "Post deleted successfully" });
+      return res.status(200).json(new ApiResponse(200,"Post deleted successfully"));
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Failed to delete post" });
     }
-  };
+  });
   
 
 export { createPost, getMyPost, getAllPosts, updatePost, deletePost };

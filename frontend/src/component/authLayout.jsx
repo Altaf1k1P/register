@@ -7,7 +7,7 @@ const AuthLayout = ({ children }) => {
     const authStatus = useSelector(selectAuthStatus);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    console.log(authStatus);
+    //console.log(authStatus);
     
 
     useEffect(() => {

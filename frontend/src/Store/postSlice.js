@@ -33,27 +33,35 @@ export const createPost = createAsyncThunk(
 export const getAllPosts = createAsyncThunk(
     "post/getAllPosts",
     async (_, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.get("/posts");
-            if (response && response.data) {
-                console.log("get all post API Response:", response.data);
-                return response.data; // Return user data if response is valid
-              } else {
-                // In case response or response.data is undefined
-                return rejectWithValue("getallpost failed: No response data");
-              }
-        } catch (error) {
-           // console.error(error);
-            return rejectWithValue(handleError(error));
+      try {
+        const response = await axiosInstance.get("/posts");
+        if (response?.data?.message && Array.isArray(response.data.message)) {
+          return response.data.message.map(post => ({
+            id: post._id,
+            title: post.title,
+            content: post.content,
+            createdAt: post.createdAt,
+            owner: post.owner ? {
+              id: post.owner._id,
+              username: post.owner.username,
+              email: post.owner.email,
+            } : null,
+          }));
+        } else {
+          throw new Error("Unexpected response format");
         }
+      } catch (error) {
+        return rejectWithValue(handleError(error));
+      }
     }
-);
+  );
+  
 
 export const deletePost = createAsyncThunk(
     "post/deletePost",
     async (postId, { rejectWithValue }) => {
       try {
-        const response = await axiosInstance.delete(`/post/delete-post/${postId}`);
+         await axiosInstance.delete(`/post/delete-post/${postId}`);
         return postId; // Return only the postId to delete it from the state
       } catch (error) {
         //console.error(error);
@@ -62,32 +70,44 @@ export const deletePost = createAsyncThunk(
     }
   );
   
+// Assuming you are using Redux Toolkit with createAsyncThunk
 
+// Example of a thunk with error handling
 export const updatePost = createAsyncThunk(
-    "post/updatePost",
-    async ({ postId, data }, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.patch(`/post/update-post/${postId}`, data);
-            return response.data;
-        } catch (error) {
-            //console.error(error);
-            return rejectWithValue(handleError(error));
-        }
+  'posts/updatePost',
+  async ({ postId, title, content }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(`/post/update-post/${postId}`, { title, content });
+      return response.data; // assuming the response is structured with data
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
+  }
 );
+
+
+  
+  
+
 
 export const myPost = createAsyncThunk(
     "post/myPost",
     async (userId, { rejectWithValue }) => {
         try {
+            //console.log("Fetching posts for user ID:", userId);
             const response = await axiosInstance.get(`/post/${userId}`);
-            return response.data;
+            //console.log("API Response:", response);
+            return response.data.message || [];
         } catch (error) {
-            //console.error(error);
-            return rejectWithValue(handleError(error));
+            //console.error("Error fetching posts:", error);
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch posts"
+            );
         }
     }
 );
+
+
 
 // Slice
 const postSlice = createSlice({
@@ -122,8 +142,11 @@ const postSlice = createSlice({
             })
             .addCase(getAllPosts.fulfilled, (state, action) => {
                 state.loading = false;
-                state.posts = action.payload;
-            })
+                state.posts = action.payload || []; // Default to empty array if payload is null or undefined
+              })
+              
+            
+            
             .addCase(getAllPosts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
@@ -149,29 +172,32 @@ const postSlice = createSlice({
 
             // updatePost
             .addCase(updatePost.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+              state.loading = true;
+              state.error = null;
             })
             .addCase(updatePost.fulfilled, (state, action) => {
-                state.loading = false;
+              state.loading = false;
             
-                if (!Array.isArray(state.posts)) {
-                    console.warn("Posts state is not an array. Skipping update.");
-                    return;
-                }
+              if (!Array.isArray(state.posts)) {
+                console.warn("Posts state is not an array. Skipping update.");
+                return;
+              }
             
-                const index = state.posts.findIndex((post) => post.id === action.meta.arg.postId);
-                if (index !== -1) {
-                    state.posts[index] = { ...state.posts[index], ...action.payload };
-                } else {
-                    console.warn(`Post with ID ${action.meta.arg.postId} not found.`);
-                }
+              // Use _id for comparison instead of id
+              const index = state.posts.findIndex((post) => post._id === action.meta.arg.postId);
+              if (index !== -1) {
+                state.posts[index] = { ...state.posts[index], ...action.payload };
+              } else {
+                console.warn(`Post with ID ${action.meta.arg.postId} not found.`);
+              }
             })
-            
             .addCase(updatePost.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
+              state.loading = false;
+              state.error = action.payload || 'An error occurred while updating the post.';
             })
+            
+            
+
 
             // myPost
             .addCase(myPost.pending, (state) => {
