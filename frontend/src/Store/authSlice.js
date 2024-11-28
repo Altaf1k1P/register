@@ -9,6 +9,10 @@ const initialState = {
   error: null,
 };
 
+// Add this to check values during development
+console.log(initialState);
+
+
 
 // ** User Registration Thunk **
 export const createAccount = createAsyncThunk("user/signup", async (formData, { rejectWithValue }) => {
