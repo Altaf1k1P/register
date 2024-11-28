@@ -2,12 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../helper/axiosInstance.js"
 
 const initialState = {
-    user: '',
-    accessToken: null,
-    refreshToken: null,
-    status: 'idle', // Options: 'idle', 'loading', 'succeeded', 'failed'
-    error: null,
+  user: JSON.parse(localStorage.getItem("user")) || '',
+  accessToken: localStorage.getItem("accessToken") || null,
+  refreshToken: localStorage.getItem("refreshToken") || null,
+  status: 'idle',
+  error: null,
 };
+
 
 // ** User Registration Thunk **
 export const createAccount = createAsyncThunk("user/signup",async (formData)=>{
@@ -19,11 +20,19 @@ export const createAccount = createAsyncThunk("user/signup",async (formData)=>{
     }
 });
 
-export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async () => {
-  const response = await axiosInstance.post("/auth/refresh-token");
-  localStorage.setItem("accessToken", response.data.accessToken);  // Store the new token
-  return response.data;
+export const refreshAccessToken = createAsyncThunk("refreshAccessToken", async (_, { rejectWithValue }) => {
+  try {
+      const response = await axiosInstance.post("/auth/refresh-token", {}, { withCredentials: true });
+      if (response.data.accessToken) {
+          return { accessToken: response.data.accessToken }; // Return token for state update
+      }
+      throw new Error("No access token returned from refresh endpoint");
+  } catch (error) {
+      console.error("Refresh token error:", error);
+      return rejectWithValue(error.response?.data || "Failed to refresh token");
+  }
 });
+
 
 export const loginUser = createAsyncThunk(
     "user/login",
@@ -101,33 +110,38 @@ const authSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(loginUser.fulfilled, (state, action) => {
-              const { loginUser, accessToken, refreshToken } = action.payload || {}; // Destructure the API response
-          
-              if (!loginUser) {
-                  console.warn("User data is missing in the response");
-              }
-          
+              const { user, accessToken, refreshToken } = action.payload || {};
               state.status = 'succeeded';
-              state.user = loginUser || ''; // Assign loginUser as user data
+              state.user = user || '';
               state.accessToken = accessToken || null;
               state.refreshToken = refreshToken || null;
           
-              // Store tokens in localStorage
+              // Persist to localStorage
+              localStorage.setItem("user", JSON.stringify(user));
               localStorage.setItem("accessToken", accessToken);
               localStorage.setItem("refreshToken", refreshToken);
           })
           
+          
               
-            .addCase(loginUser.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload || 'Login failed'; // Set error
-            })
+          .addCase(loginUser.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.payload || 'Login failed';
+            state.accessToken = null; // Ensure token is cleared on failure
+        })
+        
             .addCase(logoutUser.fulfilled, (state) => {
-                state.status = 'idle';
-                state.user = '';
-                state.accessToken = null;
-                state.refreshToken = null;
-            })
+              state.status = 'idle';
+              state.user = '';
+              state.accessToken = null;
+              state.refreshToken = null;
+          
+              // Clear localStorage
+              localStorage.removeItem("user");
+              localStorage.removeItem("accessToken");
+              localStorage.removeItem("refreshToken");
+          })
+          
             .addCase(refreshAccessToken.pending, (state) => {
               state.status = 'loading';
           })

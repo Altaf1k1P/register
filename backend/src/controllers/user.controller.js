@@ -1,4 +1,5 @@
 import {User} from "../models/user.models.js"
+import jwt from "jsonwebtoken"
 
 
 
@@ -112,52 +113,35 @@ const logout = async (req, res) => {
 };
 
 
-const refreshAccessToken = async (req, res) => {
-    // Step 1: Get refresh token from cookie (web) or body (phone app)
-   const incomingRefreshToken = req.cookie.refreshToken || res.body.refreshToken
-  
-   if(!incomingRefreshToken){
-    res.status(500).json(401, "unauthorized refresh token")
-   }
-  
-   try {
-   
-       // Step 2: verify refresh token 
-    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
-    
-   
-       // Step 3: find user by id
-     const user = await User.findById(decodedToken?._id)
-  
-     if(!user){
-        res.status(400).json(401, "invalid refresh token")
-     }
-  
-     // Step 4: check incoming refresh token and user token are same
-     if(incomingRefreshToken !== user?.refreshToken){
-        res.status(400).json(401, "refresh token is used or expired")
-     }
-  
-     // Step 5: set cookie option
-     const options = {
-       httpOnly: true, // Prevent frontend from accessing cookies
-       secure: true // Use secure cookies only in production
-        // Prevent CSRF attacks by disallowing cross-origin requests to send cookies
-     };
-    
-   
-     //step 5: create new access and refresh token
-    const {accessToken, newRefreshToken } = await genrateAccessAndRefreshToken(user?._id)
-    
-   return res
-   .status(200)
-   .cookie("accessToken", accessToken, options)
-   .cookie("refreshToken", newRefreshToken, options)
-    
-   } catch (error) {
-    res.status(500).json(401, error?.message || "Invalid refresh token",error)
-   }
-  }
+export const refreshAccessToken = async (req, res) => {
+    try {
+        const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+        // Check if refreshToken is present
+        if (!incomingRefreshToken) {
+            return res.status(401).json({ error: "Refresh token is missing" });
+        }
+
+        // Your existing logic to validate and refresh tokens
+        const decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findById(decoded._id);
+
+        if (!user) {
+            return res.status(401).json({ error: "Invalid refresh token" });
+        }
+
+        // Generate new access token
+        const newAccessToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: "15m",
+        });
+
+        return res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+        console.error("Refresh token error:", error);
+        return res.status(401).json({ error: error.message });
+    }
+};
+
 
 
 //get current user
