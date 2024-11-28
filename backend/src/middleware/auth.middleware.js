@@ -3,11 +3,9 @@ import jwt from 'jsonwebtoken';
 
 export const verifyJWT = async (req, res, next) => {
     try {
-        // Extract token from Authorization header or cookies
         const authHeader = req.header("Authorization");
         const token = req.cookies?.accessToken || authHeader?.replace("Bearer ", "");
 
-        // Check if token exists
         if (!token) {
             return res.status(401).json({
                 status: "error",
@@ -15,7 +13,6 @@ export const verifyJWT = async (req, res, next) => {
             });
         }
 
-        // Verify token and decode payload
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         if (!decodedToken || !decodedToken._id) {
             return res.status(401).json({
@@ -24,7 +21,6 @@ export const verifyJWT = async (req, res, next) => {
             });
         }
 
-        // Retrieve user from the database
         const user = await User.findById(decodedToken._id).select("-password -refreshToken");
         if (!user) {
             return res.status(401).json({
@@ -33,11 +29,9 @@ export const verifyJWT = async (req, res, next) => {
             });
         }
 
-        // Attach user to request object
         req.user = user;
         next();
     } catch (error) {
-        // Handle token-specific errors
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
                 status: "error",
