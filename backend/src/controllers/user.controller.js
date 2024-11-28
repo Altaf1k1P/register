@@ -113,7 +113,7 @@ const logout = async (req, res) => {
 };
 
 
-export const refreshAccessToken = async (req, res) => {
+ const refreshAccessToken = async (req, res) => {
     try {
         const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
