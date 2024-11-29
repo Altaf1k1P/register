@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux"; // Added useSelector
 import { addPost } from "../Store/postSlice.js"; // Import the addPost thunk
 import { useNavigate } from "react-router-dom";
-import Container from "./Container.jsx";
+import Container from "./container.jsx";
 
 const AddPost = () => {
   const [form, setForm] = useState({ title: "", content: "" });
