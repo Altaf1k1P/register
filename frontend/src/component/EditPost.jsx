@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePost } from '../Store/postSlice';
 import { useNavigate, useParams } from 'react-router-dom';
-import Container from './Container.jsx';
+import Container from './container.jsx';
 
 function EditPost() {
   const { postId } = useParams();
