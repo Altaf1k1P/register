@@ -2,42 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePost } from '../Store/postSlice';
 import { useNavigate, useParams } from 'react-router-dom';
-import Container from './container';
+import Container from './Container.jsx';
 
 function EditPost() {
   const { postId } = useParams();
   const posts = useSelector((state) => state.post.posts);
   const post = posts.find((p) => p?._id === postId);
-  const [updatedPost, setUpdatedPost] = useState(post || { title: '', content: '' });
+  const [updatedPost, setUpdatedPost] = useState({ title: '', content: '' });
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  //console.log('post',post);
-  //console.log('updated:', updatedPost);
+  const user = useSelector((state) => state.auth.user); 
+  const userId = user.userId
+  //console.log("userId for update",userId);
   
-
   useEffect(() => {
     if (post) {
-      setUpdatedPost(post);
+      setUpdatedPost({ title: post.title, content: post.content });
     }
   }, [post]);
-
-  //console.log('Post ID:', postId);
-  //console.log('Updated Post:', updatedPost);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await dispatch(updatePost({ postId, ...updatedPost })).unwrap();
       alert('Post updated successfully!');
-      navigate('/my-post');
+      navigate(`/my-post/${userId}`);
     } catch (err) {
-      //console.error('Post update failed:', err);
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
     }
   };
-  
-  
 
   return (
     <Container>

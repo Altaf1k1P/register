@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { loginUser } from '../Store/authSlice'
+import { login } from '../Store/authSlice'
 import Container from "./container.jsx"
 import {useDispatch} from "react-redux";
 import {Link, useNavigate} from "react-router-dom"; 
@@ -9,26 +9,33 @@ import {Link, useNavigate} from "react-router-dom";
 function Login() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [credentials, setCredentials] = useState({username: '', password: ''})
+  const [formData, setformData] = useState({username: '', password: ''})
   const [error , setError] = useState(null)
   //console.log(error);
   
  
 
   
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(loginUser(credentials)).unwrap();
-     //console.log("Dispatching credentials:", credentials); // Debug log
-    alert('Account created successfully!');
-          navigate('/');
-
+      const response = await dispatch(login(formData)).unwrap();
+      //console.log('Login response:', response);  // Log the entire response
+      
+      
+      if (response.accessToken) {
+        // Store the access token
+        localStorage.setItem('accessToken', response.accessToken);
+        alert('Login successful!');
+        navigate('/');  // Redirect to home page
+      } else {
+        setError('Access token is missing!');
+      }
     } catch (err) {
-      //console.error('login failed:', err);
       setError(err.message || 'Something went wrong. Please try again.');
     }
-};
+  };
+  
 
 
   return (
@@ -48,8 +55,8 @@ function Login() {
           type="text" 
           placeholder='username..' 
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={credentials.username}
-                onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+          value={formData.username}
+                onChange={(e) => setformData({ ...formData, username: e.target.value })}
                  />
           </div>
           <div className="mb-4">
@@ -58,8 +65,8 @@ function Login() {
           type="password" 
           placeholder='username..' 
          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={credentials.password}
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} 
+          value={formData.password}
+                onChange={(e) => setformData({ ...formData, password: e.target.value })} 
           />
           </div>
           

@@ -1,8 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser  from "cookie-parser";
+import morgan from "morgan";
 
 const app = express();
+
+// Logging middleware 
+app.use(morgan('dev'));
 
 // Enable JSON parsing middleware for all routes
 

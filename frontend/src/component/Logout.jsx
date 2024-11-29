@@ -1,31 +1,20 @@
-import React from 'react';
-import { logoutUser, clearUser } from '../Store/authSlice';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import  { logout }  from "../Store/authSlice.js";
 
-function Logout() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+const Logout = () => {
+  const dispatch = useDispatch();
 
-    const handleLogout = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                dispatch(clearUser());
-                navigate('/login', { replace: true });
-            })
-            .catch((error) => {
-                console.error("Logout failed:", error);
-            });
-    };
+  const handleLogout = () => {
+    // Clear user state
+    dispatch(logout());
 
-    return (
-        <button
-            onClick={handleLogout}
-            className="text-white px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
-        >
-            Logout
-        </button>
-    );
-}
+    // Optionally, redirect to login or home page
+    window.location.href = "/login"; // Adjust path as needed
+  };
+
+  return (
+    <button onClick={handleLogout}>Logout</button>
+  );
+};
 
 export default Logout;

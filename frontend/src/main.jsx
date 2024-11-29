@@ -37,7 +37,7 @@ import AuthLayout from "./component/authLayout.jsx"
           ,
         },
         {
-          path: '/my-post',
+          path: '/my-post/:userId',
           element: <AuthLayout>
               <MyPost />
           </AuthLayout>
@@ -62,11 +62,13 @@ import AuthLayout from "./component/authLayout.jsx"
   ])
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <Provider store={Store}>
+ 
+    <Provider store={Store}> 
+    <StrictMode>
      <PersistGate loading={false} persistor={persistor}>
        <RouterProvider router={router}/>
       </PersistGate>
+      </StrictMode>
     </Provider>
-  </StrictMode>,
+  ,
 )

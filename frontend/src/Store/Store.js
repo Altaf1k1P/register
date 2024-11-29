@@ -4,25 +4,34 @@ import storage from 'redux-persist/lib/storage';
 import authReducer from './authSlice.js';
 import postReducer from './postSlice.js';
 
-const persistConfig = {
+// Persist configuration for auth
+const persistConfigAuth = {
     key: 'auth',
     storage,
 };
 
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedAuthReducer = persistReducer(persistConfigAuth, authReducer);
+
+// Persist configuration for posts (if you want to persist posts)
+const persistConfigPosts = {
+    key: 'posts',
+    storage,
+};
+
+const persistedPostReducer = persistReducer(persistConfigPosts, postReducer);
 
 const store = configureStore({
     reducer: {
         auth: persistedAuthReducer,
-        post: postReducer,
+        post: persistedPostReducer,  // Now persistedPostReducer is defined
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
-                // Ignore these action types
                 ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
             },
         }),
+    devTools: true,
 });
 
 export const persistor = persistStore(store);

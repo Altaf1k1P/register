@@ -1,10 +1,10 @@
-import { User } from '../models/user.models.js';
 import jwt from 'jsonwebtoken';
+import { User } from '../models/user.models.js';
 
 export const verifyJWT = async (req, res, next) => {
     try {
         const authHeader = req.header("Authorization");
-        const token = req.cookies?.accessToken || authHeader?.replace("Bearer ", "");
+        const token = authHeader?.replace("Bearer ", "") || req.cookies?.accessToken;
 
         if (!token) {
             return res.status(401).json({
@@ -17,7 +17,7 @@ export const verifyJWT = async (req, res, next) => {
         if (!decodedToken || !decodedToken._id) {
             return res.status(401).json({
                 status: "error",
-                message: "Invalid access token structure.",
+                message: "Invalid access token.",
             });
         }
 
@@ -32,10 +32,10 @@ export const verifyJWT = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        if (error.name === 'TokenExpiredError') {
+        if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 status: "error",
-                message: "Access token has expired. Please refresh your session.",
+                message: "Access token expired. Please refresh your session.",
             });
         }
         return res.status(401).json({
