@@ -11,6 +11,9 @@ function Signup() {
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -55,16 +58,67 @@ function Signup() {
     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
     required  />
       </div>
-      <div className="mb-4">
-        <label htmlFor="password" className='block text-lg font-semibold mb-2'>Password</label>
-      <input 
-      type="password"  
-      placeholder='password..' 
-     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-     value={formData.password}
-    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-    required  />
-      </div>
+      <div className="mb-4 relative">
+  <label
+    htmlFor="password"
+    className="block text-lg font-semibold mb-2"
+  >
+    Password
+  </label>
+  <div className="relative">
+    <input
+      type={isPasswordVisible ? "text" : "password"}
+      id="password"
+      placeholder="Enter your password"
+      aria-label="Password"
+      className="w-full p-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      value={formData.password}
+      onChange={(e) =>
+        setFormData({ ...formData, password: e.target.value })
+      }
+    />
+    {/* Toggle Visibility Button */}
+    <button
+      type="button"
+      onClick={togglePasswordVisibility}
+      className="absolute top-1/2 transform -translate-y-1/2 right-3 text-gray-500 hover:text-blue-500 focus:outline-none"
+      aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+    >
+      {isPasswordVisible ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.962 0-9-3.738-9-8.5S7.038 2 12 2c4.963 0 9 3.738 9 8.5a7.999 7.999 0 01-1.875 5.325m-1.61 1.62l-3.03 3.03a2.828 2.828 0 01-4-4l3.03-3.03"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 12l-3-3m0 0l-3 3m3-3v6"
+          />
+        </svg>
+      )}
+    </button>
+  </div>
+</div>
+
       
       <div className="flex justify-between items-center">
       <button
