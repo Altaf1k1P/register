@@ -48,7 +48,7 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getAllPosts = asyncHandler(async (req, res) => {
     try {
-        const posts = await Post.find().populate("owner", "name email");  // Populate with specific fields
+        const posts = await Post.find().populate("owner", "username email");  // Populate with specific fields
         return res.status(200).json(new ApiResponse(200, posts));
     } catch (error) {
         console.error("Error getting posts:", error);
