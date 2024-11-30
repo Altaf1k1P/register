@@ -7,8 +7,7 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await API.post("/auth/login", credentials);
-     // console.log("API response:", response);
-      return response.data; // Ensure response.data has the accessToken
+      return response.data; // Ensure response.data contains user details
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
@@ -39,11 +38,17 @@ export const logout = createAsyncThunk(
   }
 );
 
-export const getCurrentUser = createAsyncThunk("getCurrentUser", async () => {
-  const response = await axiosInstance.get("/auth/current-user");
-  //console.log("API Response:", response.data);
-  return response.data;
-});
+export const getCurrentUser = createAsyncThunk(
+  "auth/getCurrentUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await API.get("/auth/current-user");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Fetching user failed");
+    }
+  }
+);
 
 // Slice
 const authSlice = createSlice({
@@ -52,6 +57,7 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Handle Login
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -65,18 +71,26 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
+
+      // Handle Signup
       .addCase(createAccount.fulfilled, (state) => {
-        state.error = null; // Reset error on successful signup
+        state.error = null; // Clear error (if any) on successful signup
       })
+
+      // Handle Logout
       .addCase(logout.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
       })
-      .addCase(getCurrentUser.fulfilled, (state, {payload}) => {
+
+      // Fetch Current User
+      .addCase(getCurrentUser.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.user =payload;
-        console.log("Fetched user:", payload); 
-    })
+        state.user = payload;
+        state.isAuthenticated = !!payload; // Mark authenticated if payload exists
+      })
+
+      // Catch All Rejected Cases
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
         (state, { payload }) => {

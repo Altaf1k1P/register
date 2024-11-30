@@ -1,15 +1,17 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import  { logout }  from "../Store/authSlice.js";
 
 const Logout = () => {
   const dispatch = useDispatch();
+  const status = useSelector((state) => state.auth.isAuthenticated)
 
   const handleLogout = () => {
     // Clear user state
     dispatch(logout());
-
-    // Optionally, redirect to login or home page
-    window.location.href = "/login"; // Adjust path as needed
+    // Check if the user is still authenticated after logout
+    if (status === false) {
+      window.location.href = "/login"; // Redirect to login page
+    }
   };
 
   return (

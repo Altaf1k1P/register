@@ -10,9 +10,9 @@ function Navbar() {
   const status = useSelector((state) => state.auth.isAuthenticated);
   const user = useSelector((state) => state.auth.user);  // user should be fetched from auth slice
   
-//console.log("userId", user.userId)
+console.log("status", status)
 
-const userId = user.userId;
+
 
   const navItems = [
     { name: "Home", slug: "/", active: true },
@@ -52,7 +52,7 @@ const userId = user.userId;
             <>
               <li className="text-white px-4 py-2 hover:bg-gray-600 rounded">
                 {/* Use user._id to access the current user's ID */}
-                <Link to={`/my-post/${userId}`}>
+                <Link to={`/my-post/${user.userId}`}>
                   My Posts
                 </Link>
               </li>
