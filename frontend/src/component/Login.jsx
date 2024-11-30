@@ -26,7 +26,7 @@ function Login() {
       if (response.accessToken) {
         // Store the access token
         localStorage.setItem('accessToken', response.accessToken);
-        alert('Login successful!');
+        
         navigate('/');  // Redirect to home page
       } else {
         setError('Access token is missing!');
