@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import { login } from '../Store/authSlice'
 import Container from "./container.jsx"
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Link, useNavigate} from "react-router-dom"; 
 
 
@@ -11,6 +11,7 @@ function Login() {
   const dispatch = useDispatch()
   const [formData, setformData] = useState({username: '', password: ''})
   const [error , setError] = useState(null)
+  const { loading } = useSelector((state) => state.auth);
   //console.log(error);
   
  
@@ -72,11 +73,12 @@ function Login() {
           
           <div className="flex justify-between items-center">
           <button
-            type="submit"
-            className={'px-4 py-2 text-white rounded-md   bg-blue-500 hover:bg-blue-600'}
-          >
-            login
-          </button>
+              type="submit"
+              className=" py-2 px-4 text-white font-medium rounded-md bg-blue-500 hover:bg-blue-600"
+              disabled={loading}
+            >
+              {loading ? "Login..." : "Login"}
+            </button>
            <p className="mt-4 text-sm text-center text-gray-600">
                     don't have an account?{' '}
                     <Link to="/signup" className="text-indigo-600 hover:underline">
