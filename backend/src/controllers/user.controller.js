@@ -51,7 +51,7 @@ const register = async (req, res) => {
         const user = await User.create({ username, email, password });
         res.status(201).json({ message: "User registered successfully", user });
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).json({ error: "Server Error" });
     }
 };
@@ -71,8 +71,8 @@ const login = async (req, res) => {
         const accessToken = await user.generateAccessToken(); // Ensure this generates a valid token
         const refreshToken = await user.generateRefreshToken(); // Same for refresh token
 
-        console.log('AccessToken:', accessToken); // Log the actual token string
-        console.log('RefreshToken:', refreshToken); // Log the actual token string
+       // console.log('AccessToken:', accessToken); // Log the actual token string
+       // console.log('RefreshToken:', refreshToken); // Log the actual token string
 
         const options = {
             httpOnly: true,
@@ -93,7 +93,7 @@ const login = async (req, res) => {
             });
 
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).json({ error: "Server Error" });
     }
 };
@@ -118,7 +118,7 @@ const logout = async (req, res) => {
             .clearCookie("refreshToken", options)
             .json({ message: "User logged out" });
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).json({ error: "Something went wrong while logging out" });
     }
 };
@@ -129,7 +129,7 @@ const getCurrentUser = async (req, res) => {
   .status(200)
   .json({"data":req.user})
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).json({ error: "Something went wrong while get current user" });
     }
 }
@@ -148,12 +148,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         
         const user = await User.findById(decodedToken._id);
         if (!user) {
-            console.error(`User not found for id: ${decodedToken._id}`);
+           // console.error(`User not found for id: ${decodedToken._id}`);
             throw new ApiError(401, "Invalid refresh token: User not found");
         }
 
         if (incomingRefreshToken !== user.refreshToken) {
-            console.error(`Refresh token mismatch for user: ${user._id}`);
+            //console.error(`Refresh token mismatch for user: ${user._id}`);
             throw new ApiError(403, "Refresh token is invalid or expired");
         }
 
@@ -181,7 +181,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             ));
 
     } catch (error) {
-        console.error("Error in refreshAccessToken:", error);
+        //console.error("Error in refreshAccessToken:", error);
         if (error instanceof jwt.JsonWebTokenError) {
             throw new ApiError(401, "Invalid refresh token: " + error.message);
         }

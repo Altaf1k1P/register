@@ -37,7 +37,7 @@ const createPost = asyncHandler(async (req, res) => {
 
         return res.status(201).json(new ApiResponse(201, post));
     } catch (error) {
-        console.error("Error creating post:", error);
+        //console.error("Error creating post:", error);
         return res.status(500).json(new ApiError("Something went wrong while creating post"));
     }
 });
@@ -51,7 +51,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
         const posts = await Post.find().populate("owner", "username email");  // Populate with specific fields
         return res.status(200).json(new ApiResponse(200, posts));
     } catch (error) {
-        console.error("Error getting posts:", error);
+        //console.error("Error getting posts:", error);
         return res.status(500).json(new ApiError("Something went wrong while getting posts"));
     }
 });
@@ -81,7 +81,7 @@ const getMyPost = asyncHandler(async (req, res) => {
 
         return res.status(200).json(new ApiResponse(200, userPosts));
     } catch (error) {
-        console.error("Error retrieving posts:", error);
+        //console.error("Error retrieving posts:", error);
         return res.status(500).json({ error: "Server error while retrieving posts" });
     }
 });
@@ -140,7 +140,7 @@ const updatePost = asyncHandler(async (req, res) => {
 
         return res.status(200).json(new ApiResponse(200, updatedPost, "Post updated successfully"));
     } catch (error) {
-        console.error("Error while updating the post:", error);
+        //console.error("Error while updating the post:", error);
         return res.status(500).json({ error: error.message || "Internal server error" });
     }
 });
@@ -170,7 +170,7 @@ const deletePost = asyncHandler(async (req, res) => {
         await Post.findByIdAndDelete(postId);
         return res.status(200).json(new ApiResponse(200, { message: "Post deleted successfully" }));
     } catch (error) {
-        console.error("Error while deleting the post:", error);
+        //console.error("Error while deleting the post:", error);
         return res.status(500).json({ error: "Failed to delete post" });
     }
 });

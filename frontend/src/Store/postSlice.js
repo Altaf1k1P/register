@@ -21,7 +21,7 @@ export const addPost = createAsyncThunk(
   async (postData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/post", postData);
-      console.log("API response:", response.data.message);
+      //console.log("API response:", response.data.message);
       return response.data;
     } catch (error) {
       return rejectWithValue("Failed to add post");
@@ -63,7 +63,7 @@ export const myPost = createAsyncThunk(
       try {
           console.log("Fetching posts for user ID:", userId);
           const response = await axiosInstance.get(`/post/${userId}`);
-          console.log("API Response:", response);
+          //console.log("API Response:", response);
           return response.data.message || [];
       } catch (error) {
           //console.error("Error fetching posts:", error);
@@ -111,7 +111,7 @@ const postsSlice = createSlice({
       })
 
       .addCase(myPost.fulfilled, (state, {payload}) => {
-        console.log("Payload received:", payload);
+        //console.log("Payload received:", payload);
         state.loading = false;
         state.posts = payload.message || payload; // Assuming API returns the user's posts
     })
