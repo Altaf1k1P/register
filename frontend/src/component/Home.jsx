@@ -1,32 +1,16 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts } from "../Store/postSlice.js";
-//import { selectUser } from "../Store/authSlice.js";
 import { Link } from "react-router-dom";
 
 const Home = () => {
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.post);
     const posts = useSelector((state) => state.post.posts);
-    //console.log("Posts from Redux: ", JSON.stringify(posts, null, 2)); // Pretty print the posts
-
-    
-   
 
     useEffect(() => {
         dispatch(fetchPosts()); // Fetch all posts
     }, [dispatch]);
-   
-
-    // const handleDelete = (postId) => {
-    //     if (!postId) {
-    //         console.error("Post ID is undefined"); // Additional logging
-    //         return;
-    //     }
-    //     if (window.confirm("Are you sure you want to delete this post?")) {
-    //         dispatch(deletePost(postId));
-    //     }
-    // };
 
     if (loading) {
         return (
@@ -56,16 +40,22 @@ const Home = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {posts.map((post) => (
-                        <div key={post._id} className="bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden">
+                        <div
+                            key={post._id}
+                            className="bg-white shadow-lg rounded-lg border border-gray-300 overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl group"
+                        >
                             <div className="p-4">
-                                <h3 className="text-xl font-semibold text-gray-800 truncate">{post.title}</h3>
-                                <p className="text-gray-700 mt-2 line-clamp-3">{post.content}</p>
+                                <h3 className="text-xl font-semibold text-gray-800 group-hover:whitespace-normal truncate">
+                                    {post.title}
+                                </h3>
+                                <p className="text-gray-700 mt-2 group-hover:line-clamp-none line-clamp-3">
+                                    {post.content}
+                                </p>
                                 <p className="text-sm text-gray-500 mt-4">
                                     Posted by: {post.owner?.username || "Unknown"} on{" "}
                                     {new Date(post.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-                            
                         </div>
                     ))}
                 </div>
