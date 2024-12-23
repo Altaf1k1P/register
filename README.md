@@ -173,7 +173,7 @@ git commit -m "Add new feature"
 
 
 4. Push your branch:
-   ```
+```
 bash
 
 git push origin feature-name
