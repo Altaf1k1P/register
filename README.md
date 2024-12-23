@@ -11,7 +11,7 @@ for both small and large screens, the app offers a collapsible hamburger menu on
 - Protected routes for accessing user-specific pages.
 - Personalized user experience.
 
-##
+
 
 ## Technologies Used
 - ### React: Frontend framework for interactive user interfaces.
@@ -34,7 +34,6 @@ for both small and large screens, the app offers a collapsible hamburger menu on
  - Restricts access to certain pages (e.g., "Add Post") for authenticated users only.
 4. Dynamic User Experience:
    - Personalized greetings and user-specific links like "My Posts".
-##
 
 # Installation and Setup
 
@@ -79,5 +78,14 @@ npm start
 bash
 
 http://localhost:3000
+
+```
+
+# Project Structure
+
+```
+bash
+
+npm start
 
 ```
