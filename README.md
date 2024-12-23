@@ -86,6 +86,107 @@ http://localhost:3000
 ```
 bash
 
+src/
+├── components/
+│   ├── Navbar.jsx        // Responsive navigation bar
+│   ├── Logout.jsx        // Logout functionality
+├── features/
+│   ├── authSlice.js      // Redux slice for authentication
+├── pages/
+│   ├── Login.jsx         // Login page
+│   ├── Signup.jsx        // Signup page
+│   ├── Home.jsx          // Home page
+│   ├── AddPost.jsx       // Add Post page (protected)
+├── utils/
+│   ├── authUtils.js      // Utility functions for token handling
+├── App.js                // Main app component
+├── index.js              // React app entry point
+
+
+```
+
+# Scripts
+
+  - ### Start Development Server:
+    ```
+bash
+
 npm start
 
 ```
+
+- ### Build for Production:
+
+bash
+Copy code
+
+
+```
+bash
+
+npm start
+
+``
+
+
+# Usage
+
+## Authentication
+ 1. Sign up with a new account.
+ 2. Log in with valid credentials.
+ 3. Access restricted features such as "Add Post" or "My Posts".
+ 4. Logout to secure your session.
+
+## Responsive Design
+
+ - On smaller screens, the navigation bar collapses into a hamburger menu.
+ - Open the menu to view navigation links and user-specific options.
+
+## Future Enhancements:
+- Server-Side Authentication: Integrate secure session handling.
+- Role-Based Access Control: Restrict certain features based on user roles.
+- Improved Error Handling: Add user-friendly messages for API and validation errors.
+
+
+## Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork the repository.
+
+2. Create a new branch:
+ ```
+bash
+
+git checkout -b feature-name
+
+```
+
+3. Commit your changes:
+  ```
+bash
+
+git commit -m "Add new feature"
+
+```
+
+
+
+4. Push your branch:
+   ```
+bash
+
+git push origin feature-name
+
+```
+
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the [MIT License]()
+
+## Contact
+For any questions or feedback, reach out:
+- Email: [Altafpathan1k1@gmail.com](Altafpathan1k1@gmail.com)
+- GitHub: [altaf1k1](https://github.com/Altaf1k1P)
